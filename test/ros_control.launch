@@ -1,0 +1,20 @@
+<launch>
+  <arg name="control_config" default="/home/irsl/temp/ros_control_shm/ros_control.yaml"/>
+  <!--arg name="controllers" default="joint_state_controller" /-->
+  <arg name="controllers" default="joint_state_controller joint_controller" />
+
+  <node name="irsl_test" pkg="ros_control_shm"
+        type="node_shm" output="screen">
+    <!-- param -->
+  </node>
+
+  <!-- ROS Control -->
+  <group ns="irsl_test">
+    <rosparam file="$(arg control_config)" command="load"/>
+
+    <!-- load the controllers -->
+    <node name="robot_controller_spawner" pkg="controller_manager"
+          type="spawner" output="screen" respawn="true"
+          args="$(arg controllers)"/>
+  </group>
+</launch>

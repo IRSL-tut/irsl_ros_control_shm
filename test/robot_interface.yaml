@@ -1,0 +1,33 @@
+robot_model:
+  name: dummy_robot
+  url: 'file:///home/irsl/temp/assembler_dev/dummy_robot.body'
+# mobile_base:
+#   type: geometry_msgs/Twist
+#   topic: /arm_robot3/cmd_vel
+#   baselink: Root
+joint_groups:
+  -
+    name: default
+    topic: /irsl_test/joint_controller/command
+    # type: 'action' or 'command'
+    type: command
+    joint_names: [ 'joint0', 'joint1', 'joint2' ]
+
+devices:
+  -
+    topic: /irsl_test/joint_states
+    class: JointState
+    name: joint_state
+  -
+    topic: /irsl_test/joint_controller/state
+    class: JointTrajectoryState
+    name: joint_trajectory_state
+
+# jupyter console --kernel=choreonoid
+# exec(open('/choreonoid_ws/install/share/irsl_choreonoid/sample/irsl_import.py').read())
+# ri = RobotInterface('robot_interface.yaml')
+# robot=ri.getRobotModel()
+# av=robot.angleVector()
+# robot.angleVector(fv(0.4, 0.4, 0.5))
+# ri.sendAngleVector(robot.angleVector(), tm=30)
+# ri.sendAngleVector(fv(0, 0, 0), tm=30)

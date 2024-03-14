@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ros_control_shm</name>
+  <version>0.0.0</version>
+  <description>ROS node</description>
+  <maintainer email="kakiuchi.yohei.sw@tut.jp">YoheiKakiuchi</maintainer>
+  <license>MIT</license>
+  <author email="kakiuchi.yohei.sw@tut.jp">YoheiKakiuchi</author>
+  <!-- <url type="website"></url> -->
+  <!-- <url type="repository"></url> -->
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
+  <!--depend>pluginlib</depend-->
+  <depend>angles</depend>
+  <depend>controller_manager</depend>
+  <depend>hardware_interface</depend>
+  <depend>joint_limits_interface</depend>
+  <depend>transmission_interface</depend>
+  <depend>urdf</depend>
+
+  <export>
+    <!--<build_type>cmake</build_type>-->
+    <!--<general_ros_control plugin="${prefix}/plugins.xml" />-->
+  </export>
+</package>
