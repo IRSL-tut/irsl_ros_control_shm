@@ -1,23 +1,43 @@
 joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
-  joints: ['joint0', 'joint1', 'joint2']
+  joints:
+    - "RARM_SHOULDER_P"
+    - "RARM_SHOULDER_R"
+    - "RARM_ELBOW_P"
+    - "RARM_FINGER"
+    - "RLEG_HIP_R"
+    - "RLEG_HIP_P"
+    - "RLEG_KNEE_P"
+    - "RLEG_ANKLE_P"
+    - "RLEG_ANKLE_R"
+    - "LARM_SHOULDER_P"
+    - "LARM_SHOULDER_R"
+    - "LARM_ELBOW_P"
+    - "LARM_FINGER"
+    - "LLEG_HIP_R"
+    - "LLEG_HIP_P"
+    - "LLEG_KNEE_P"
+    - "LLEG_ANKLE_P"
+    - "LLEG_ANKLE_R"
 joint_controller:
   type: position_controllers/JointTrajectoryController
   joints:
-    - joint0
-    - joint1
-    - joint2
-  gains:
-    joint0:
-      p: 100
-      i: 10
-      d: 1
-    joint1:
-      p: 100
-      i: 10
-      d: 1
-    joint2:
-      p: 100
-      i: 10
-      d: 1
+    - "RARM_SHOULDER_P"
+    - "RARM_SHOULDER_R"
+    - "RARM_ELBOW_P"
+    - "RARM_FINGER"
+    - "RLEG_HIP_R"
+    - "RLEG_HIP_P"
+    - "RLEG_KNEE_P"
+    - "RLEG_ANKLE_P"
+    - "RLEG_ANKLE_R"
+    - "LARM_SHOULDER_P"
+    - "LARM_SHOULDER_R"
+    - "LARM_ELBOW_P"
+    - "LARM_FINGER"
+    - "LLEG_HIP_R"
+    - "LLEG_HIP_P"
+    - "LLEG_KNEE_P"
+    - "LLEG_ANKLE_P"
+    - "LLEG_ANKLE_R"

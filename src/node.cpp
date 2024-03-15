@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     std::vector<joint_info> settings;
     {   // settings may be generated from .body or .urdf, etc.
         // TODO:
-        settings.resize(3);
+        settings.resize(18);
         int cntr = 0;
         for(auto s = settings.begin(); s != settings.end(); s++) {
             s->index = cntr++;
@@ -34,14 +34,34 @@ int main(int argc, char **argv)
             s->interfaceType = "Position";
             s->jointType = "revolute";
         }
-        settings[0].name = "joint0";
-        settings[1].name = "joint1";
-        settings[2].name = "joint2";
+        //
+        settings[ 0].name = "RARM_SHOULDER_P";
+        settings[ 1].name = "RARM_SHOULDER_R";
+        settings[ 2].name = "RARM_ELBOW_P";
+        settings[ 8].name = "RARM_FINGER";
+        //
+        settings[ 3].name = "RLEG_HIP_R";
+        settings[ 4].name = "RLEG_HIP_P";
+        settings[ 5].name = "RLEG_KNEE_P";
+        settings[ 6].name = "RLEG_ANKLE_P";
+        settings[ 7].name = "RLEG_ANKLE_R";
+        //
+        settings[ 9].name = "LARM_SHOULDER_P";
+        settings[10].name = "LARM_SHOULDER_R";
+        settings[11].name = "LARM_ELBOW_P";
+        settings[17].name = "LARM_FINGER";
+        //
+        settings[12].name = "LLEG_HIP_R";
+        settings[13].name = "LLEG_HIP_P";
+        settings[14].name = "LLEG_KNEE_P";
+        settings[15].name = "LLEG_ANKLE_P";
+        settings[16].name = "LLEG_ANKLE_R";
     }
+    //// dump controller yaml
 
     {   // write dummy urdf for trajectory_confroller
         std::ostringstream oss;
-        print_joint_urdf_header(oss, "dummyRobot");
+        print_joint_urdf_header(oss, "KXRHumanoid");
         for(auto s = settings.begin(); s != settings.end(); s++) {
             print_joint_urdf_joint(oss, *s);
         }
@@ -62,9 +82,9 @@ int main(int argc, char **argv)
         if(!!robotHWShm) {
             {
                 ShmSettings ss;
-                ss.numJoints = 3;
-                ss.numForceSensors = 1;
-                ss.numImuSensors   = 1;
+                ss.numJoints = settings.size();
+                ss.numForceSensors = 0;
+                ss.numImuSensors   = 0;
                 ss.hash    = 8888;
                 ss.shm_key = 8888;
                 //ss.extraDataSize = 0;

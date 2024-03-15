@@ -11,8 +11,25 @@ joint_groups:
     topic: /irsl_test/joint_controller/command
     # type: 'action' or 'command'
     type: command
-    joint_names: [ 'joint0', 'joint1', 'joint2' ]
-
+    joint_names:
+      - "RARM_SHOULDER_P"
+      - "RARM_SHOULDER_R"
+      - "RARM_ELBOW_P"
+      - "RARM_FINGER"
+      - "RLEG_HIP_R"
+      - "RLEG_HIP_P"
+      - "RLEG_KNEE_P"
+      - "RLEG_ANKLE_P"
+      - "RLEG_ANKLE_R"
+      - "LARM_SHOULDER_P"
+      - "LARM_SHOULDER_R"
+      - "LARM_ELBOW_P"
+      - "LARM_FINGER"
+      - "LLEG_HIP_R"
+      - "LLEG_HIP_P"
+      - "LLEG_KNEE_P"
+      - "LLEG_ANKLE_P"
+      - "LLEG_ANKLE_R"
 devices:
   -
     topic: /irsl_test/joint_states
@@ -22,7 +39,6 @@ devices:
     topic: /irsl_test/joint_controller/state
     class: JointTrajectoryState
     name: joint_trajectory_state
-
 # jupyter console --kernel=choreonoid
 # exec(open('/choreonoid_ws/install/share/irsl_choreonoid/sample/irsl_import.py').read())
 # ri = RobotInterface('robot_interface.yaml')

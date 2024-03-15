@@ -1,15 +1,15 @@
 <launch>
-  <arg name="control_config" default="/home/irsl/temp/ros_control_shm/ros_control.yaml"/>
+  <arg name="control_config" default="/home/irsl/temp/ros_control_shm/test/ros_control.yaml"/>
   <!--arg name="controllers" default="joint_state_controller" /-->
   <arg name="controllers" default="joint_state_controller joint_controller" />
 
-  <node name="irsl_test" pkg="ros_control_shm"
+  <node name="kxr_roscontrol" pkg="ros_control_shm"
         type="node_shm" output="screen">
     <!-- param -->
   </node>
 
   <!-- ROS Control -->
-  <group ns="irsl_test">
+  <group ns="kxr_roscontrol">
     <rosparam file="$(arg control_config)" command="load"/>
 
     <!-- load the controllers -->
