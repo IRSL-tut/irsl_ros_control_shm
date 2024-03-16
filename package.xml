@@ -19,6 +19,8 @@
   <depend>transmission_interface</depend>
   <depend>urdf</depend>
 
+  <depend>joint_state_controller</depend>
+  <depend>joint_trajectory_controller</depend>
   <export>
     <!--<build_type>cmake</build_type>-->
     <!--<general_ros_control plugin="${prefix}/plugins.xml" />-->
