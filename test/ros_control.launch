@@ -1,15 +1,17 @@
 <launch>
-  <arg name="control_config" default="/home/irsl/temp/ros_control_shm/test/ros_control.yaml"/>
-  <!--arg name="controllers" default="joint_state_controller" /-->
-  <arg name="controllers" default="joint_state_controller joint_controller" />
+  <!--arg name="control_config" default="/home/irsl/temp/ros_control_shm/test/ros_control.yaml"/-->
+  <arg name="control_config" default="/home/leus/kxr/ros_control_shm/test/ros_control.yaml"/>
 
-  <node name="kxr_roscontrol" pkg="ros_control_shm"
+  <!--arg name="controllers" default="joint_state_controller" /-->
+  <arg name="controllers" default="joint_state_controller trajectory_controller" />
+
+  <node name="kxr" pkg="ros_control_shm"
         type="node_shm" output="screen">
     <!-- param -->
   </node>
 
   <!-- ROS Control -->
-  <group ns="kxr_roscontrol">
+  <group ns="kxr">
     <rosparam file="$(arg control_config)" command="load"/>
 
     <!-- load the controllers -->

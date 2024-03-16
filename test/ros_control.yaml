@@ -20,7 +20,7 @@ joint_state_controller:
     - "LLEG_KNEE_P"
     - "LLEG_ANKLE_P"
     - "LLEG_ANKLE_R"
-joint_controller:
+trajectory_controller:
   type: position_controllers/JointTrajectoryController
   joints:
     - "RARM_SHOULDER_P"
