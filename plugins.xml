@@ -1,0 +1,10 @@
+<library path="lib/libRobotHWShm">
+  <class
+      name="hardware_interface/RobotHWShm"
+      type="hardware_interface::RobotHWShm"
+      base_class_type="hardware_interface::RobotHWShm">
+    <description>
+      A default robot simulation interface which constructs joint handles from an SDF/URDF.
+    </description>
+  </class>
+</library>
