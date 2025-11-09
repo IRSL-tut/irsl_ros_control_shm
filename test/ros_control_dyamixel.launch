@@ -1,0 +1,29 @@
+<launch>
+  <arg name="control_config" default="ros_control_dyamixel.yaml" />
+
+  <arg name="controllers" default="joint_state_controller trajectory_controller" />
+
+  <arg name="robot_name" default="dyamixel" />
+
+  <node name="$(arg robot_name)" pkg="ros_control_shm" type="node_shm" output="screen">
+    <param name="shm_hash" value="8888" />
+    <param name="shm_key" value="8888" />
+    <rosparam param="jointnames">
+      - LINK_0
+      - LINK_1
+      - LINK_2
+      - LINK_3
+      - LINK_4
+    </rosparam>
+  </node>
+
+  <!-- ROS Control -->
+  <group ns="$(arg robot_name)">
+    <rosparam file="$(arg control_config)" command="load" />
+
+    <!-- load the controllers -->
+    <node name="robot_controller_spawner" pkg="controller_manager"
+      type="spawner" output="screen" respawn="true"
+      args="$(arg controllers)" />
+  </group>
+</launch>
