@@ -4,21 +4,44 @@
 #include <controller_manager/controller_manager.h>
 #include <boost/shared_ptr.hpp>
 
-#include "irsl/realtime_task.h"
-
 #include "RobotHWShm.h"
 #include "print_urdf.h"
 
+#include "irsl/shm_controller.h"
+#include "irsl/realtime_task.h"
+#include "irsl/thirdparty/CLI11.hpp"
+
+namespace isc = irsl_shm_controller;
+namespace irt = irsl_realtime_task;
+
+class OptParse : public CLI::App
+{
+private:
+    uint64_t _hash;
+    uint32_t _key;
+public:
+    OptParse(const std::string name) : CLI::App(name)
+    {
+        add_option("--hash", _hash, "")->default_val("8888");
+        add_option("--shm_key", _key, "")->default_val("8888");
+        allow_extras(true);
+    }
+    uint64_t getHash() { return _hash; }
+    uint32_t getShmKey() { return _key; }
+};
+
 int main(int argc, char **argv)
 {
-    ////
     boost::shared_ptr<hardware_interface::RobotHWShm> robotHWShm;
     std::shared_ptr<controller_manager::ControllerManager> controllerManager;
 
     //// ROS initialization
     ros::init(argc, argv, "node_shm");
     ros::NodeHandle nodeHandle = ros::NodeHandle("~");
-    
+
+    OptParse op("test");
+    op.parse(argc, argv);
+
     std::vector<std::string> jointnames;
     if (nodeHandle.getParam("jointnames", jointnames)) {
         ROS_INFO("Successfully got jointnames");
@@ -26,18 +49,16 @@ int main(int argc, char **argv)
         ROS_ERROR("Failed to get param 'jointnames'");
         return 0;
     }
+    double period = 0.01;
+    nodeHandle.getParam("period", period);
+    ROS_INFO("period: %f", period);
 
-    int shm_hash;
-    int shm_key;
-    nodeHandle.param("shm_hash", shm_hash, 8888);  // デフォルト値 8888
-    nodeHandle.param("shm_key",  shm_key,  8888);  // デフォルト値 8888
-
-    std::vector<joint_info> settings;
-    {   // settings may be generated from .body or .urdf, etc.
+    std::vector<joint_info> joint_settings;
+    {   // joint_settings may be generated from .body or .urdf, etc.
         // TODO:
-        settings.resize(jointnames.size());
+        joint_settings.resize(jointnames.size());
         int cntr = 0;
-        for(auto s = settings.begin(); s != settings.end(); s++) {
+        for(auto s = joint_settings.begin(); s != joint_settings.end(); s++) {
             s->index = cntr++;
             s->upper =  6;
             s->lower = -6;
@@ -49,16 +70,15 @@ int main(int argc, char **argv)
 
         for (size_t i=0; i<jointnames.size();i++)
         {
-            settings[i].name = jointnames[i];
-            std::cout << i << " : "  << settings[i].name << std::endl;
+            joint_settings[i].name = jointnames[i];
+            std::cout << i << " : "  << joint_settings[i].name << std::endl;
         }
     }
-    //// dump controller yaml
 
     {   // write dummy urdf for trajectory_confroller
         std::ostringstream oss;
-        print_joint_urdf_header(oss, "KXRHumanoid");
-        for(auto s = settings.begin(); s != settings.end(); s++) {
+        print_joint_urdf_header(oss, "DummyRobot"); // TODO: name of robot
+        for(auto s = joint_settings.begin(); s != joint_settings.end(); s++) {
             print_joint_urdf_joint(oss, *s);
         }
         print_joint_urdf_footer(oss);
@@ -76,62 +96,55 @@ int main(int argc, char **argv)
         robotHWShm = boost::make_shared<hardware_interface::RobotHWShm>();
 
         if(!!robotHWShm) {
-            {
-                ShmSettings ss;
-                ss.numJoints = settings.size();
-                ss.numForceSensors = 0;
-                ss.numImuSensors   = 0;
-                ss.hash    = shm_hash;
-                ss.shm_key = shm_key;
-                ss.jointType = ShmSettings::PositionCommand | ShmSettings::PositionGains;
-
-                ShmManager *sm = new ShmManager(ss);
-
+            {   //// shared memory settings
+                isc::ShmSettings ss;
+                ss.hash    = op.getHash();
+                ss.shm_key = op.getShmKey();
+                isc::ShmManager *sm = new isc::ShmManager(ss);
                 bool res;
-                res = sm->openSharedMemory(false);
+                res = sm->openSharedMemory(false); // open as client
                 std::cerr << "shm open: " << res << std::endl;
                 std::cout << "shm checkHeader() : " << sm->checkHeader() << std::endl;
-
+                // TODO : check compatibility joint_settings and shm-settings
                 res = sm->isOpen();
                 std::cout << "shm isOpen: " << res << std::endl;
                 if (!res) {
                     // exit
+                    ros::shutdown();
                     return 0;
                 }
                 robotHWShm->setShmManager(sm);
             }
-            robotHWShm->initializeJoints(settings);
+            robotHWShm->initializeJoints(joint_settings);
 
             if(!controllerManager){
                 controllerManager = std::make_shared<controller_manager::ControllerManager>(robotHWShm.get(), nodeHandle);
             }
 
-            //// For realtime
-            irsl_realtime_task::IntervalStatistics tm(10000);
-            tm.start();
+            unsigned long period_ns = 1000000000 * period;
+            irt::RealtimeContext rt(period_ns);
+            rt.start();
 
             int cntr = 0;
             ros::Time previous = ros::Time::now();
-            while(true) {
-                //// loop
+            rt.waitNextFrame();
+            while(ros::ok()) {  //// realtime-loop
                 ros::Time now        = ros::Time::now();
                 ros::Duration period = now - previous;
                 previous = now;
-
                 ////
                 robotHWShm->read(now, period);
                 robotHWShm->write(now, period);
-                controllerManager->update(now, period, false); //// TODO: false
-
-                //// wait
-                tm.sleepUntil(10000000);
-                tm.sync();
+                controllerManager->update(now, period, false); // TODO: false
+                ////
                 cntr++;
                 if (cntr > 100) {
-                    std::cerr << "max: " << tm.getMaxInterval() << std::endl;
-                    tm.reset();
+                    std::cerr << "max: " << rt.getMaxInterval() << std::endl;
+                    rt.reset();
                     cntr = 0;
                 }
+                //// wait
+                rt.waitNextFrame();
             }
         } else {
             std::cout << "HW is not initialided" << std::endl;
@@ -139,5 +152,7 @@ int main(int argc, char **argv)
     } else {
         std::cout << "ROS is not initialided" << std::endl;
     }
+    ros::shutdown();
+    // TODO: finalize
     return 0;
 }

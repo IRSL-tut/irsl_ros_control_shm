@@ -1,4 +1,5 @@
 #include "RobotHWShm.h"
+#include "irsl/shm_controller.h"
 
 //#include <angles/angles.h>
 //#include <pluginlib/class_list_macros.h>
@@ -10,6 +11,9 @@
 
 using namespace std;
 
+namespace isc = irsl_shm_controller;
+typedef std::vector<isc::irsl_float_type> floatvec;
+
 namespace hardware_interface {
 
 class RobotHWShm::Impl
@@ -20,15 +24,15 @@ public:
     }
 
 public:
-    ShmManager *shm;
+    isc::ShmManager *shm;
 
     std::vector<std::string> jointNames;
-    std::vector<irsl_float_type> cur_pos;
-    std::vector<irsl_float_type> cur_vel;
-    std::vector<irsl_float_type> cur_eff;
-    std::vector<irsl_float_type> com_pos;
-    std::vector<irsl_float_type> com_vel;
-    std::vector<irsl_float_type> com_eff;
+    floatvec cur_pos;
+    floatvec cur_vel;
+    floatvec cur_eff;
+    floatvec com_pos;
+    floatvec com_vel;
+    floatvec com_eff;
 
     // Interface //
     hardware_interface::JointStateInterface    jointStateInterface;
@@ -56,34 +60,34 @@ void RobotHWShm::initializeJoints(std::vector<joint_info> &joints)
     }
     dof = maxIndex > dof ? maxIndex : dof;
     std::cerr << "dof : " << dof << std::endl;
-    cur_pos.resize(dof);
-    cur_vel.resize(dof);
-    cur_eff.resize(dof);
+    impl->cur_pos.resize(dof);
+    impl->cur_vel.resize(dof);
+    impl->cur_eff.resize(dof);
 
-    com_pos.resize(dof);
-    com_vel.resize(dof);
-    com_eff.resize(dof);
+    impl->com_pos.resize(dof);
+    impl->com_vel.resize(dof);
+    impl->com_eff.resize(dof);
 
     for(auto j = joints.begin(); j != joints.end(); j++) {
         int idx = j->index;
         jointStateInterface.registerHandle(
-            hardware_interface::JointStateHandle(j->name, &(cur_pos[idx]), &(cur_vel[idx]), &(cur_eff[idx])) );
+            hardware_interface::JointStateHandle(j->name, &(impl->cur_pos[idx]), &(impl->cur_vel[idx]), &(impl->cur_eff[idx])) );
         if (j->interfaceType == "Position") {
             // Joint Handle //
             hardware_interface::JointHandle jointHandle;
-            jointHandle = hardware_interface::JointHandle(jointStateInterface.getHandle(j->name), &(com_pos[idx]));
+            jointHandle = hardware_interface::JointHandle(jointStateInterface.getHandle(j->name), &(impl->com_pos[idx]));
             positionJointInterface.registerHandle(jointHandle);
         }
         if (j->interfaceType == "Velocity") {
             // Joint Handle //
             hardware_interface::JointHandle jointHandle;
-            jointHandle = hardware_interface::JointHandle(jointStateInterface.getHandle(j->name), &(com_vel[idx]));
+            jointHandle = hardware_interface::JointHandle(jointStateInterface.getHandle(j->name), &(impl->com_vel[idx]));
             velocityJointInterface.registerHandle(jointHandle);
         }
         if (j->interfaceType == "Effort") {
             // Joint Handle //
             hardware_interface::JointHandle jointHandle;
-            jointHandle = hardware_interface::JointHandle(jointStateInterface.getHandle(j->name), &(com_eff[idx]));
+            jointHandle = hardware_interface::JointHandle(jointStateInterface.getHandle(j->name), &(impl->com_eff[idx]));
             effortJointInterface.registerHandle(jointHandle);
         }
     }
@@ -93,17 +97,25 @@ void RobotHWShm::initializeJoints(std::vector<joint_info> &joints)
     registerInterface(&effortJointInterface);
 }
 
-void RobotHWShm::setShmManager(ShmManager *ptr)
+void RobotHWShm::setShmManager(isc::ShmManager *ptr)
 {
     impl->shm = ptr;
+    //// Wait frame
+    //// set CurPos -> ComPos
 }
 
 void RobotHWShm::read(const ros::Time& time, const ros::Duration& period)
 {
     if (!!(impl->shm)) {
-        impl->shm->readPositionCurrent(cur_pos);
-        impl->shm->readVelocityCurrent(cur_vel);
-        impl->shm->readTorqueCurrent(cur_eff);
+        bool r0 = impl->shm->readPositionCurrent(impl->cur_pos);
+        bool r1 = impl->shm->readVelocityCurrent(impl->cur_vel);
+        bool r2 = impl->shm->readTorqueCurrent(impl->cur_eff);
+#if 0
+        std::cerr << "rd " << r0 << ", " << r1 << ", " << r1 << std::endl;
+        std::cerr << impl->cur_pos[0] << std::endl;
+        std::cerr << impl->cur_vel[0] << std::endl;
+        std::cerr << impl->cur_eff[0] << std::endl;
+#endif
     }
 }
 
@@ -112,18 +124,18 @@ void RobotHWShm::write(const ros::Time& time, const ros::Duration& period)
     bool res;
     if (!!(impl->shm)) {
 #if 0
-        std::cerr << "w(" << impl->frame << ") " << com_pos[0] << std::endl;
-        res = impl->shm->writePositionCommand(com_pos);
+        std::cerr << "w(" << impl->frame << ") " << impl->com_pos[0] << std::endl;
+        res = impl->shm->writePositionCommand(impl->com_pos);
         if(!res) {
             std::cerr << "fail" << std::endl;
         }
 #endif
-        impl->shm->writePositionCommand(com_pos);
-        impl->shm->writeVelocityCommand(com_vel);
-        impl->shm->writeTorqueCommand(com_eff);
+        impl->shm->writePositionCommand(impl->com_pos);
+        impl->shm->writeVelocityCommand(impl->com_vel);
+        impl->shm->writeTorqueCommand(impl->com_eff);
         //
-        res = impl->shm->setFrame(impl->frame);
-        res = impl->shm->setTime(time.sec, time.nsec);
+        //res = impl->shm->setFrame(impl->frame);
+        //res = impl->shm->setTime(time.sec, time.nsec);
 #if 0
         std::vector<double> vec(6);
         res = impl->shm->readPositionCommand(vec);

@@ -14,11 +14,13 @@
 #include <iostream>
 
 #include "joint_info.h"
-#include "irsl/shm_controller.h"
 
-using namespace irsl_shm_controller;
+namespace irsl_shm_controller {
+class ShmManager;
+}
 
 namespace hardware_interface {
+
 
 class RobotHWShm : public RobotHW
 {
@@ -33,9 +35,10 @@ public:
     virtual void read(const ros::Time& time, const ros::Duration& period) override;
     virtual void write(const ros::Time& time, const ros::Duration& period) override;
 
-    void setShmManager(ShmManager *ptr);
+    void setShmManager(irsl_shm_controller::ShmManager *ptr);
     void initializeJoints(std::vector<joint_info> &joints);
 
+#if 0
     //// may move to impl
     std::vector<std::string> jointNames;
     std::vector<double> cur_pos;
@@ -44,6 +47,7 @@ public:
     std::vector<double> com_pos;
     std::vector<double> com_vel;
     std::vector<double> com_eff;
+#endif
 
     // Interface //
     hardware_interface::JointStateInterface    jointStateInterface;
