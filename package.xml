@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>ros_control_shm</name>
+  <name>irsl_ros_control_shm</name>
   <version>0.0.0</version>
   <description>ROS node</description>
   <maintainer email="kakiuchi.yohei.sw@tut.jp">YoheiKakiuchi</maintainer>
@@ -21,6 +21,10 @@
 
   <depend>joint_state_controller</depend>
   <depend>joint_trajectory_controller</depend>
+
+  <depend>irsl_shm_libs</depend>
+  <depend>irsl_realtime_utils</depend>
+  <depend>irsl_common_utils</depend>
   <export>
     <!--<build_type>cmake</build_type>-->
     <!--<general_ros_control plugin="${prefix}/plugins.xml" />-->

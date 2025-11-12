@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.5.0)
-project(ros_control_shm)
+cmake_minimum_required(VERSION 3.15)
+project(irsl_ros_control_shm)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -27,16 +27,14 @@ catkin_package(
   #DEPENDS
 )
 
-find_package(irsl_shm_controller)
-Message("irsl_shm_controller_INCLUDE_DIRS : ${irsl_shm_controller_INCLUDE_DIRS}")
-Message("irsl_shm_controller_LIBRARIES : ${irsl_shm_controller_LIBRARIES}")
+find_package(irsl_shm_libs)
 
 include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(node_shm src/node.cpp src/RobotHWShm.cpp src/print_urdf.cpp)
 target_link_libraries(node_shm
   ${catkin_LIBRARIES}
-  irsl_shm_controller
+  irsl_shm_libs::irsl_shm_libs
 )
 # install(TARGETS node_shm
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -57,8 +55,7 @@ install(TARGETS node_shm
 #  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 #)
-
-install(FILES plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+#install(FILES plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 #install(DIRECTORY launch
 #  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

@@ -1,0 +1,32 @@
+###
+#
+#
+#
+###
+
+# irsl_libs
+- git:
+    local-name: irsl_shm_controller_library
+#    uri: https://github.com/IRSL-tut/irsl_shm_controller_library.git
+#    version: main
+    uri: https://github.com/IRSL-tut/irsl_shm_controller_library.git
+    version: rc_wip00
+# dynamixel_libs
+- git:
+    local-name: dynamixel_sdk
+    uri: https://github.com/ROBOTIS-GIT/DynamixelSDK.git
+    version: noetic
+- git:
+    local-name: dynamixel_workbench
+    uri: https://github.com/ROBOTIS-GIT/dynamixel-workbench.git
+    version: noetic
+# dynamixel_hardware_shm -> irsl_libs, dynamixel_libs
+- git:
+    local-name: irsl_dynamixel_hardware_shm
+    uri: https://github.com/IRSL-tut/irsl_dynamixel_hardware_shm.git
+    version: rc_wip00
+# ros_control_shm -> irsl_libs, ROS
+- git:
+    local-name: irsl_ros_control_shm
+    uri: https://github.com/IRSL-tut/irsl_ros_control_shm.git
+    version: devel

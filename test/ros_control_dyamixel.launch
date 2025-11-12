@@ -1,13 +1,11 @@
 <launch>
   <arg name="control_config" default="ros_control_dyamixel.yaml" />
-
   <arg name="controllers" default="joint_state_controller trajectory_controller" />
-
   <arg name="robot_name" default="dyamixel" />
-
-  <node name="$(arg robot_name)" pkg="ros_control_shm" type="node_shm" output="screen">
-    <param name="shm_hash" value="8888" />
-    <param name="shm_key" value="8888" />
+  <arg name="hash" default="6666" />
+  <arg name="shm_key" default="9999" />
+  <node name="$(arg robot_name)" pkg="irsl_ros_control_shm" type="node_shm" output="screen"
+        args="--hash=$(arg hash) --shm_key=$(arg shm_key)" >
     <rosparam param="jointnames">
       - LINK_0
       - LINK_1
