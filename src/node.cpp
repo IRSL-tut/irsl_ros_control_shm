@@ -49,6 +49,9 @@ int main(int argc, char **argv)
         ROS_ERROR("Failed to get param 'jointnames'");
         return 0;
     }
+    double period = 0.01;
+    nodeHandle.getParam("period", period);
+    ROS_INFO("period: %f", period);
 
     std::vector<joint_info> joint_settings;
     {   // joint_settings may be generated from .body or .urdf, etc.
@@ -107,6 +110,7 @@ int main(int argc, char **argv)
                 std::cout << "shm isOpen: " << res << std::endl;
                 if (!res) {
                     // exit
+                    ros::shutdown();
                     return 0;
                 }
                 robotHWShm->setShmManager(sm);
@@ -117,8 +121,8 @@ int main(int argc, char **argv)
                 controllerManager = std::make_shared<controller_manager::ControllerManager>(robotHWShm.get(), nodeHandle);
             }
 
-            //irt::RealtimeContext rt(5000000); // 5ms TODO
-            irt::RealtimeContext rt(1000000000); // 1000ms TODO
+            unsigned long period_ns = 1000000000 * period;
+            irt::RealtimeContext rt(period_ns);
             rt.start();
 
             int cntr = 0;
@@ -148,6 +152,7 @@ int main(int argc, char **argv)
     } else {
         std::cout << "ROS is not initialided" << std::endl;
     }
+    ros::shutdown();
     // TODO: finalize
     return 0;
 }

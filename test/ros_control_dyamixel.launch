@@ -6,6 +6,7 @@
   <arg name="shm_key" default="9999" />
   <node name="$(arg robot_name)" pkg="irsl_ros_control_shm" type="node_shm" output="screen"
         args="--hash=$(arg hash) --shm_key=$(arg shm_key)" >
+    <param name="period" value="0.05" />
     <rosparam param="jointnames">
       - LINK_0
       - LINK_1
