@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-project(irsl_ros_control_shm)
+project(irsl_ros_control_shm
+  VERSION 0.99.1
+  LANGUAGES CXX
+)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING

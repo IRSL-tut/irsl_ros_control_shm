@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>irsl_ros_control_shm</name>
-  <version>0.0.0</version>
+  <version>0.99.1</version>
   <description>ROS node</description>
   <maintainer email="kakiuchi.yohei.sw@tut.jp">YoheiKakiuchi</maintainer>
   <license>MIT</license>
