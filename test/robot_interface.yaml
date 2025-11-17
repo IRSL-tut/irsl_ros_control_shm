@@ -1,6 +1,6 @@
 robot_model:
-  name: dummy_robot
-  url: 'file:///home/irsl/temp/assembler_dev/dummy_robot.body'
+  name: robotname
+  url: 'dummy_robot.body'
 # mobile_base:
 #   type: geometry_msgs/Twist
 #   topic: /arm_robot3/cmd_vel
@@ -8,35 +8,21 @@ robot_model:
 joint_groups:
   -
     name: default
-    topic: /irsl_test/joint_controller/command
-    # type: 'action' or 'command'
-    type: command
+    topic: /robotname/trajectory_controller/follow_joint_trajectory
+    type: action
     joint_names:
-      - "RARM_SHOULDER_P"
-      - "RARM_SHOULDER_R"
-      - "RARM_ELBOW_P"
-      - "RARM_FINGER"
-      - "RLEG_HIP_R"
-      - "RLEG_HIP_P"
-      - "RLEG_KNEE_P"
-      - "RLEG_ANKLE_P"
-      - "RLEG_ANKLE_R"
-      - "LARM_SHOULDER_P"
-      - "LARM_SHOULDER_R"
-      - "LARM_ELBOW_P"
-      - "LARM_FINGER"
-      - "LLEG_HIP_R"
-      - "LLEG_HIP_P"
-      - "LLEG_KNEE_P"
-      - "LLEG_ANKLE_P"
-      - "LLEG_ANKLE_R"
+      - "LINK_0"
+      - "LINK_1"
+      - "LINK_2"
+      - "LINK_3"
+      - "LINK_4"
 devices:
   -
-    topic: /irsl_test/joint_states
+    topic: /robotname/joint_states
     class: JointState
     name: joint_state
   -
-    topic: /irsl_test/joint_controller/state
+    topic: /robotname/trajectory_controller/state
     class: JointTrajectoryState
     name: joint_trajectory_state
 # jupyter console --kernel=choreonoid

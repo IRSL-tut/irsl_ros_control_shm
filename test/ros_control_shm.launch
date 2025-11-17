@@ -1,12 +1,16 @@
 <launch>
-  <arg name="control_config" default="ros_control_dyamixel.yaml" />
+  <arg name="control_config" default="ros_control.yaml" />
   <arg name="controllers" default="joint_state_controller trajectory_controller" />
-  <arg name="robot_name" default="dyamixel" />
-  <arg name="hash" default="6666" />
+  <arg name="robot_name" default="robotname" />
+  <!-- -->
+  <arg name="hash"    default="6666" />
   <arg name="shm_key" default="9999" />
+  <arg name="period"  default="0.05" />
+
+  <!-- Shm -->
   <node name="$(arg robot_name)" pkg="irsl_ros_control_shm" type="node_shm" output="screen"
         args="--hash=$(arg hash) --shm_key=$(arg shm_key)" >
-    <param name="period" value="0.05" />
+    <param name="period" value="$(arg period)" />
     <rosparam param="jointnames">
       - LINK_0
       - LINK_1
@@ -19,7 +23,6 @@
   <!-- ROS Control -->
   <group ns="$(arg robot_name)">
     <rosparam file="$(arg control_config)" command="load" />
-
     <!-- load the controllers -->
     <node name="robot_controller_spawner" pkg="controller_manager"
       type="spawner" output="screen" respawn="true"
