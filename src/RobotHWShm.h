@@ -1,5 +1,4 @@
-#ifndef ROBOT_HW_SHM_H
-#define ROBOT_HW_SHM_H
+#pragma once
 
 #include <hardware_interface/robot_hw.h>
 #include <ros/node_handle.h>
@@ -29,14 +28,14 @@ public:
 
     //virtual bool initSim(const ros::NodeHandle& nh, cnoid::ControllerIO* args) final;
     virtual bool init(ros::NodeHandle& /*root_nh*/, ros::NodeHandle &/*robot_hw_nh*/) {
-        std::cerr << "init:" << std::endl;
+        std::cerr << "initialize: RobotHWShm" << std::endl;
         return true;
     }
     virtual void read(const ros::Time& time, const ros::Duration& period) override;
     virtual void write(const ros::Time& time, const ros::Duration& period) override;
 
     void setShmManager(irsl_shm_controller::ShmManager *ptr);
-    void initializeJoints(std::vector<joint_info> &joints);
+    void initializeJoints(const std::vector<joint_info> &joints);
 
 #if 0
     //// may move to impl
@@ -63,5 +62,3 @@ private:
 typedef std::shared_ptr<RobotHWShm> RobotHWShmPtr;
 
 }  // namespace hardware_interface
-
-#endif  // ROBOT_HW_SHM_H
