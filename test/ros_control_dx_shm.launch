@@ -1,0 +1,34 @@
+<launch>
+  <arg name="control_config" default="$(env PWD)/ros_control.yaml" />
+  <arg name="dynamixel_config" default="$(env PWD)/dynamixel_config.yaml" />
+  <arg name="controllers" default="joint_state_controller trajectory_controller" />
+  <arg name="robot_name" default="robotname" />
+  <!-- -->
+  <arg name="hash"    default="6666" />
+  <arg name="shm_key" default="9999" />
+  <arg name="period"  default="0.01" />
+
+  <!-- Shm -->
+  <node name="$(arg robot_name)" pkg="irsl_ros_control_shm" type="node_dx_shm" output="screen"
+        args="--hash=$(arg hash) --shm_key=$(arg shm_key) --config=$(arg dynamixel_config)" >
+    <param name="period" value="$(arg period)" />
+    <rosparam param="jointnames">
+      - LINK_0
+      - LINK_1
+      - LINK_2
+      - LINK_3
+      - LINK_4
+    </rosparam>
+  </node>
+
+  <!-- ROS Control -->
+  <group ns="$(arg robot_name)">
+    <rosparam file="$(arg control_config)" command="load" />
+    <!-- load the controllers -->
+    <node name="robot_controller_spawner" pkg="controller_manager"
+      type="spawner" output="screen" respawn="true"
+      args="$(arg controllers)" />
+  </group>
+
+  <param name="robot_description" textfile="5links.urdf" />
+</launch>
