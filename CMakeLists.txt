@@ -49,6 +49,26 @@ install(TARGETS node_shm
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+find_package(dynamixel_hardware_shm)
+#get_cmake_property(_variableNames VARIABLES)
+#message("VARIABLES>>>>")
+#list (SORT _variableNames)
+#foreach (_variableName ${_variableNames})
+#  message("${_variableName}=${${_variableName}}")
+#endforeach()
+#message("VARIABLES<<<<")
+if (${dynamixel_hardware_shm_FOUND})
+  message("BUILD: node_dx_shm with dynamixel_hardware_shm")
+  add_executable(node_dx_shm src/node_dx.cpp src/RobotDxHWShm.cpp src/RobotHWShm.cpp src/print_urdf.cpp)
+  target_link_libraries(node_dx_shm
+    ${catkin_LIBRARIES}
+    irsl_shm_libs::irsl_shm_libs
+    dynamixel_hardware_shm::dynamixel_hardware_shm
+  )
+  install(TARGETS node_dx_shm
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+endif()
 #add_library(RobotHWShm src/RobotHWShm.cpp)
 #target_link_libraries(RobotHWShm
 #  ${catkin_LIBRARIES}
