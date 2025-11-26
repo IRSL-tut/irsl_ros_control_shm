@@ -32,6 +32,7 @@ int main(int argc, char **argv)
     op.opt_parse(argc, argv);
 
     std::vector<std::string> jointnames;
+    // TODO: jointnames reading from config
     if (nodeHandle.getParam("jointnames", jointnames)) {
         ROS_INFO("Successfully got jointnames");
     } else {
@@ -82,13 +83,15 @@ int main(int argc, char **argv)
     spinner->start();
 
     if(ros::isInitialized()) {
-        std::cerr << "init: robotHWShm" << std::endl;
+        if (verbose) {
+            std::cerr << "init: robotHWShm" << std::endl;
+        }
         robotHWShm = boost::make_shared<hardware_interface::RobotDxHWShm>();
 
         if(!!robotHWShm) {
             {
                 irsl_dynamixel::DynamixelShmPtr ds(new irsl_dynamixel::DynamixelShm());
-                std::cerr << "ds->initialize : " << fname << std::endl;
+                ROS_INFO_STREAM( "ds->initialize : " << fname  );
                 ds->initialize(fname, op.getHash(), op.getShmKey());
                 //
                 ds->readDx();
@@ -96,7 +99,9 @@ int main(int argc, char **argv)
                 //
                 robotHWShm->setDxLib(ds);
             }
-            std::cerr << "initialieJoints" << std::endl;
+            if (verbose) {
+                std::cerr << "initialieJoints" << std::endl;
+            }
             robotHWShm->initializeJoints(joint_settings);
 
             if(!controllerManager){
