@@ -1,6 +1,6 @@
 robot_model:
   name: robotname
-  url: 'dummy_robot.body'
+  url: '5links.body'
 # mobile_base:
 #   type: geometry_msgs/Twist
 #   topic: /arm_robot3/cmd_vel

@@ -5,7 +5,7 @@
   <!-- -->
   <arg name="hash"    default="6666" />
   <arg name="shm_key" default="9999" />
-  <arg name="period"  default="0.05" />
+  <arg name="period"  default="0.01" />
 
   <!-- Shm -->
   <node name="$(arg robot_name)" pkg="irsl_ros_control_shm" type="node_shm" output="screen"
@@ -28,4 +28,6 @@
       type="spawner" output="screen" respawn="true"
       args="$(arg controllers)" />
   </group>
+
+  <param name="robot_description" textfile="5links.urdf" />
 </launch>
