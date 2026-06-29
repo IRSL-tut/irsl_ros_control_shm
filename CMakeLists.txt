@@ -4,83 +4,95 @@ project(irsl_ros_control_shm
   LANGUAGES CXX
 )
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
     FORCE)
 endif()
 
-find_package(
-  catkin REQUIRED COMPONENTS
-  roscpp
-#  pluginlib
-  angles
-  controller_manager
-  hardware_interface
-  joint_limits_interface
-  transmission_interface
-  urdf
-)
-
-### catkin xxxx
-catkin_package(
-  #INCLUDE_DIRS include
-  #LIBRARIES ros_control_shm
-  CATKIN_DEPENDS controller_manager
-  #DEPENDS
-)
+find_package(ament_cmake REQUIRED)
+find_package(hardware_interface REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
 
 find_package(irsl_shm_libs)
+find_package(dynamixel_hardware_shm QUIET)
 
-include_directories(${catkin_INCLUDE_DIRS})
+set(DX_PLUGIN_XML "")
+add_library(${PROJECT_NAME} SHARED
+  src/RobotHWShm.cpp
+)
 
-add_executable(node_shm src/node.cpp src/RobotHWShm.cpp src/print_urdf.cpp)
-target_link_libraries(node_shm
-  ${catkin_LIBRARIES}
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+
+ament_target_dependencies(${PROJECT_NAME}
+  hardware_interface
+  pluginlib
+  rclcpp
+  rclcpp_lifecycle
+)
+
+target_link_libraries(${PROJECT_NAME}
   irsl_shm_libs::irsl_shm_libs
 )
-# install(TARGETS node_shm
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-# )
 
-install(TARGETS node_shm
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-find_package(dynamixel_hardware_shm)
-#get_cmake_property(_variableNames VARIABLES)
-#message("VARIABLES>>>>")
-#list (SORT _variableNames)
-#foreach (_variableName ${_variableNames})
-#  message("${_variableName}=${${_variableName}}")
-#endforeach()
-#message("VARIABLES<<<<")
-if (${dynamixel_hardware_shm_FOUND})
-  message("BUILD: node_dx_shm with dynamixel_hardware_shm")
-  add_executable(node_dx_shm src/node_dx.cpp src/RobotDxHWShm.cpp src/RobotHWShm.cpp src/print_urdf.cpp)
-  target_link_libraries(node_dx_shm
-    ${catkin_LIBRARIES}
-    irsl_shm_libs::irsl_shm_libs
+if(dynamixel_hardware_shm_FOUND)
+  message(STATUS "BUILD: RobotDxHWShm plugin with dynamixel_hardware_shm")
+  target_sources(${PROJECT_NAME} PRIVATE src/RobotDxHWShm.cpp)
+  target_link_libraries(${PROJECT_NAME}
     dynamixel_hardware_shm::dynamixel_hardware_shm
   )
-  install(TARGETS node_dx_shm
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
+  set(DX_PLUGIN_XML [=[
+  <class
+      name="irsl_ros_control_shm/RobotDxHWShm"
+      type="irsl_ros_control_shm::RobotDxHWShm"
+      base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ROS2 control shared-memory hardware interface with Dynamixel sync hooks.
+    </description>
+  </class>]=])
 endif()
-#add_library(RobotHWShm src/RobotHWShm.cpp)
-#target_link_libraries(RobotHWShm
-#  ${catkin_LIBRARIES}
-#)
-#install(TARGETS RobotHWShm
-#  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-#)
-#install(FILES plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-#install(DIRECTORY launch
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-#  USE_SOURCE_PERMISSIONS
-#  )
+configure_file(plugins.xml.in ${CMAKE_CURRENT_BINARY_DIR}/plugins.xml @ONLY)
+
+pluginlib_export_plugin_description_file(hardware_interface ${CMAKE_CURRENT_BINARY_DIR}/plugins.xml)
+
+install(TARGETS ${PROJECT_NAME}
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(FILES
+  src/RobotHWShm.h
+  src/RobotDxHWShm.h
+  src/joint_info.h
+  DESTINATION include/${PROJECT_NAME}
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins.xml
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY launch test
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_dependencies(
+  hardware_interface
+  pluginlib
+  rclcpp
+  rclcpp_lifecycle
+)
+
+ament_package()

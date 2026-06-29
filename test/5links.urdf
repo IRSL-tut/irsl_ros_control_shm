@@ -223,4 +223,41 @@
 		<limit lower="-3.1415926535897931" upper="3.1415926535897931" velocity="31.415926535897931" effort="100" />
 	</joint>
 	<xacro:gz_trans_pos joint_name="LINK_4" />
+	<ros2_control name="ShmSystem" type="system">
+		<hardware>
+			<plugin>irsl_ros_control_shm/RobotHWShm</plugin>
+			<param name="hash">6666</param>
+			<param name="shm_key">9999</param>
+		</hardware>
+		<joint name="LINK_0">
+			<command_interface name="position" />
+			<state_interface name="position" />
+			<state_interface name="velocity" />
+			<state_interface name="effort" />
+		</joint>
+		<joint name="LINK_1">
+			<command_interface name="position" />
+			<state_interface name="position" />
+			<state_interface name="velocity" />
+			<state_interface name="effort" />
+		</joint>
+		<joint name="LINK_2">
+			<command_interface name="position" />
+			<state_interface name="position" />
+			<state_interface name="velocity" />
+			<state_interface name="effort" />
+		</joint>
+		<joint name="LINK_3">
+			<command_interface name="position" />
+			<state_interface name="position" />
+			<state_interface name="velocity" />
+			<state_interface name="effort" />
+		</joint>
+		<joint name="LINK_4">
+			<command_interface name="position" />
+			<state_interface name="position" />
+			<state_interface name="velocity" />
+			<state_interface name="effort" />
+		</joint>
+	</ros2_control>
 </robot>

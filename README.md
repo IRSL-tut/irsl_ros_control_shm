@@ -1,11 +1,16 @@
 # irsl_ros_control_shm
 
-# Compile
+ROS2 control hardware interface backed by the shared-memory transport from irsl_shm_controller_library.
 
-- This package depends on packages in https://github.com/IRSL-tut/irsl_shm_controller_library
+## Build
 
-- (Optional) If you compile this package with https://github.com/IRSL-tut/irsl_dynamixel_hardware_shm, you can make all-in-one node
+- This package depends on libraries from https://github.com/IRSL-tut/irsl_shm_controller_library.
+- Optional Dynamixel support is enabled when `dynamixel_hardware_shm` is available at configure time.
 
-# Samples
+## Usage
 
-Check test directory
+This package now provides a ROS2 control `hardware_interface::SystemInterface` plugin instead of a ROS1 standalone node.
+
+Use the plugin name `irsl_ros_control_shm/RobotHWShm` inside a `<ros2_control>` block in your robot description and run it with `controller_manager`'s `ros2_control_node`.
+
+The sample files under `test/` show the expected ROS2 controller YAML and a minimal URDF block. A ready-to-run example launch file is installed under `launch/ros2_control_shm.launch.py`.

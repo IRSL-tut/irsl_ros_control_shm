@@ -4,25 +4,18 @@
 #include "irsl_dynamixel_hardware_shm/DynamixelShmLib.h"
 #include <memory>
 
-namespace hardware_interface {
+namespace irsl_ros_control_shm {
 
 class RobotDxHWShm : public RobotHWShm
 {
 public:
-    RobotDxHWShm() {};
+    RobotDxHWShm() = default;
 
-    //virtual bool initSim(const ros::NodeHandle& nh, cnoid::ControllerIO* args) final;
-    virtual bool init(ros::NodeHandle& /*root_nh*/, ros::NodeHandle &/*robot_hw_nh*/) {
-        std::cerr << "initialize: RobotDxHWShm" << std::endl;
-        return true;
-    }
-    virtual void read(const ros::Time& time, const ros::Duration& period) override;
-    virtual void write(const ros::Time& time, const ros::Duration& period) override;
+    hardware_interface::return_type read(const rclcpp::Time& time, const rclcpp::Duration& period) override;
+    hardware_interface::return_type write(const rclcpp::Time& time, const rclcpp::Duration& period) override;
 
-    void setDxLib(irsl_dynamixel::DynamixelShmPtr ptr) {
-        dx_shm_ptr = ptr;
-        this->setShmManager(ptr->shm_manager().get());
-    }
+protected:
+    hardware_interface::CallbackReturn initializeBackend() override;
 
 public:
     irsl_dynamixel::DynamixelShmPtr dx_shm_ptr;
@@ -30,4 +23,4 @@ public:
 
 typedef std::shared_ptr<RobotDxHWShm> RobotDxHWShmPtr;
 
-}  // namespace hardware_interface
+}  // namespace irsl_ros_control_shm

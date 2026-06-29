@@ -1,32 +1,31 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>irsl_ros_control_shm</name>
   <version>0.99.1</version>
-  <description>ROS node</description>
+  <description>ROS2 control hardware interface backed by IRSL shared memory.</description>
   <maintainer email="kakiuchi.yohei.sw@tut.jp">YoheiKakiuchi</maintainer>
   <license>MIT</license>
   <author email="kakiuchi.yohei.sw@tut.jp">YoheiKakiuchi</author>
   <!-- <url type="website"></url> -->
   <!-- <url type="repository"></url> -->
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <depend>roscpp</depend>
-  <!--depend>pluginlib</depend-->
-  <depend>angles</depend>
-  <depend>controller_manager</depend>
-  <depend>hardware_interface</depend>
-  <depend>joint_limits_interface</depend>
-  <depend>transmission_interface</depend>
-  <depend>urdf</depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>joint_state_controller</depend>
-  <depend>joint_trajectory_controller</depend>
+  <depend>hardware_interface</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
 
   <depend>irsl_shm_libs</depend>
-  <depend>irsl_realtime_utils</depend>
-  <depend>irsl_common_utils</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
   <export>
-    <!--<build_type>cmake</build_type>-->
-    <!--<general_ros_control plugin="${prefix}/plugins.xml" />-->
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
