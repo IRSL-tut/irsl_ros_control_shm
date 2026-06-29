@@ -22,7 +22,6 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(irsl_shm_libs)
 find_package(dynamixel_hardware_shm QUIET)
 
-set(DX_PLUGIN_XML "")
 add_library(${PROJECT_NAME} SHARED
   src/RobotHWShm.cpp
 )
@@ -50,20 +49,9 @@ if(dynamixel_hardware_shm_FOUND)
   target_link_libraries(${PROJECT_NAME}
     dynamixel_hardware_shm::dynamixel_hardware_shm
   )
-  set(DX_PLUGIN_XML [=[
-  <class
-      name="irsl_ros_control_shm/RobotDxHWShm"
-      type="irsl_ros_control_shm::RobotDxHWShm"
-      base_class_type="hardware_interface::SystemInterface">
-    <description>
-      ROS2 control shared-memory hardware interface with Dynamixel sync hooks.
-    </description>
-  </class>]=])
 endif()
 
-configure_file(plugins.xml.in ${CMAKE_CURRENT_BINARY_DIR}/plugins.xml @ONLY)
-
-pluginlib_export_plugin_description_file(hardware_interface ${CMAKE_CURRENT_BINARY_DIR}/plugins.xml)
+pluginlib_export_plugin_description_file(hardware_interface plugins.xml)
 
 install(TARGETS ${PROJECT_NAME}
   EXPORT export_${PROJECT_NAME}
@@ -79,7 +67,7 @@ install(FILES
   DESTINATION include/${PROJECT_NAME}
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins.xml
+install(FILES plugins.xml
   DESTINATION share/${PROJECT_NAME}
 )
 

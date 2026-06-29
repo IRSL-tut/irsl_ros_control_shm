@@ -67,7 +67,14 @@ double *selectStateBuffer(const std::string &interface_name,
 class RobotHWShm::Impl
 {
 public:
-    Impl() : shm(nullptr), frame(0), hash(8888), shm_key(8888)
+        Impl()
+            : shm(nullptr),
+                frame(0),
+                hash(8888),
+                shm_key(8888),
+                has_position_command(false),
+                has_velocity_command(false),
+                has_effort_command(false)
     {
     }
     void initializeJoints(const std::vector<joint_info> &joints);
@@ -96,6 +103,9 @@ public:
     uint64_t frame;
     uint64_t hash;
     uint32_t shm_key;
+    bool has_position_command;
+    bool has_velocity_command;
+    bool has_effort_command;
 };
 
 RobotHWShm::RobotHWShm()
@@ -155,6 +165,21 @@ hardware_interface::CallbackReturn RobotHWShm::on_init(const hardware_interface:
 hardware_interface::CallbackReturn RobotHWShm::initializeJoints(const std::vector<joint_info> &joints)
 {
     impl->initializeJoints(joints);
+
+    auto settings = impl->owned_shm->settings();
+    if (impl->has_position_command && settings.getOffsetPositionCommand() < 0) {
+        RCLCPP_ERROR(logger(), "Position command interface requested but not available in shared memory");
+        return hardware_interface::CallbackReturn::ERROR;
+    }
+    if (impl->has_velocity_command && settings.getOffsetVelocityCommand() < 0) {
+        RCLCPP_ERROR(logger(), "Velocity command interface requested but not available in shared memory");
+        return hardware_interface::CallbackReturn::ERROR;
+    }
+    if (impl->has_effort_command && settings.getOffsetTorqueCommand() < 0) {
+        RCLCPP_ERROR(logger(), "Effort command interface requested but not available in shared memory");
+        return hardware_interface::CallbackReturn::ERROR;
+    }
+
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -216,6 +241,9 @@ void RobotHWShm::Impl::initializeJoints(const std::vector<joint_info> &joints)
         int idx = j->index;
         jointNames[idx] = j->name;
         command_interfaces[idx] = j->interfaceType;
+        has_position_command = has_position_command || (j->interfaceType == hardware_interface::HW_IF_POSITION);
+        has_velocity_command = has_velocity_command || (j->interfaceType == hardware_interface::HW_IF_VELOCITY);
+        has_effort_command = has_effort_command || (j->interfaceType == hardware_interface::HW_IF_EFFORT);
         state_interfaces[idx] = {
             hardware_interface::HW_IF_POSITION,
             hardware_interface::HW_IF_VELOCITY,
@@ -341,9 +369,9 @@ hardware_interface::return_type RobotHWShm::Impl::write(const rclcpp::Time& time
         shm_com_eff[index] = com_eff[index];
     }
 
-    const bool position_ok = shm->writePositionCommand(shm_com_pos);
-    const bool velocity_ok = shm->writeVelocityCommand(shm_com_vel);
-    const bool effort_ok = shm->writeTorqueCommand(shm_com_eff);
+    const bool position_ok = !has_position_command || shm->writePositionCommand(shm_com_pos);
+    const bool velocity_ok = !has_velocity_command || shm->writeVelocityCommand(shm_com_vel);
+    const bool effort_ok = !has_effort_command || shm->writeTorqueCommand(shm_com_eff);
 
     frame++;
     return (position_ok && velocity_ok && effort_ok) ? hardware_interface::return_type::OK : hardware_interface::return_type::ERROR;

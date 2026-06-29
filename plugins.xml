@@ -1,4 +1,4 @@
-<library path="lib/libirsl_ros_control_shm">
+<library path="irsl_ros_control_shm">
   <class
       name="irsl_ros_control_shm/RobotHWShm"
       type="irsl_ros_control_shm::RobotHWShm"
@@ -7,5 +7,4 @@
       ROS2 control shared-memory hardware interface.
     </description>
   </class>
-@DX_PLUGIN_XML@
 </library>

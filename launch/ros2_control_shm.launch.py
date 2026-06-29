@@ -15,9 +15,16 @@ def generate_launch_description():
 
     return LaunchDescription([
         Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            output='screen',
+            parameters=[{'robot_description': robot_description}],
+        ),
+        Node(
             package='controller_manager',
             executable='ros2_control_node',
             output='screen',
+            remappings=[('~/robot_description', '/robot_description')],
             parameters=[
                 {'robot_description': robot_description},
                 controller_config,
