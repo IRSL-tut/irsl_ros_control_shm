@@ -1,0 +1,34 @@
+###
+#
+# cd /path_to/some_ws/src; vcs import --recursive < this_file.vcs
+# cd /path_to/some_ws
+# colcon build --parallel-workers 1 --merge-install --event-handlers console_direct+ desktop_notification- log_command+ status- --packages-up-to irsl_dynamixel_hardware_shm
+# colcon build --parallel-workers 1 --merge-install --event-handlers console_direct+ desktop_notification- log_command+ status- --packages-up-to irsl_ros_control_shm
+#
+###
+
+# irsl_libs
+- git:
+    local-name: irsl_shm_controller_library
+    uri: https://github.com/IRSL-tut/irsl_shm_controller_library.git
+    version: main
+# dynamixel_libs
+- git:
+    local-name: dynamixel_sdk
+    uri: https://github.com/ROBOTIS-GIT/DynamixelSDK.git
+    version: jazzy
+- git:
+    local-name: dynamixel_workbench
+    uri: https://github.com/ROBOTIS-GIT/dynamixel-workbench.git
+    version: jazzy
+# dynamixel_hardware_shm -> irsl_libs, dynamixel_libs
+- git:
+    local-name: irsl_dynamixel_hardware_shm
+    uri: https://github.com/IRSL-tut/irsl_dynamixel_hardware_shm.git
+    version: main
+# ros_control_shm -> irsl_libs, ROS, (dynamixel_hardware_shm)
+- git:
+    local-name: irsl_ros_control_shm
+    uri: https://github.com/IRSL-tut/irsl_ros_control_shm.git
+    version: ros2_migration
+
